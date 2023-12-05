@@ -1,0 +1,29 @@
+<!-- login.html -->
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mb-3">Login</h2>
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    {{ form.username|add_class:'form-control' }}
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    {{ form.password|add_class:'form-control' }}
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,158 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f8fa;
+    color: #14171a;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 60%;
+    margin: auto;
+    overflow: hidden;
+}
+
+.header, .footer {
+    background: #1da1f2;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.header h1, .footer h1 {
+    margin: 0;
+    padding: 10px;
+}
+
+.tweet-list {
+    list-style: none;
+    padding: 0;
+}
+
+.tweet-list li {
+    background: #fff;
+    border: 1px solid #e1e8ed;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+.tweet-content {
+    font-size: 16px;
+}
+
+.tweet-user {
+    font-weight: bold;
+}
+
+.tweet-date {
+    color: #657786;
+    font-size: 14px;
+}
+
+form {
+    background: #fff;
+    border: 1px solid #e1e8ed;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+input[type=text], textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 20px 0;
+    display: inline-block;
+    border: 1px solid #ccd6dd;
+    border-radius: 4px;
+}
+
+.signup-link a {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #1da1f2;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.signup-link a:hover {
+    background-color: #0d95e8;
+}
+
+/* styles.css */
+.tweet-button-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.tweet-button {
+    display: inline-block;
+    background-color: #1da1f2;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.tweet-button:hover {
+    background-color: #0d95e8;
+}
+
+.button {
+    display: inline-block;
+    background-color: #1da1f2;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-right: 10px; /* ボタン間の余白 */
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.button:hover {
+    background-color: #0d95e8;
+}
+
+/* styles.css */
+.top-left-buttons {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.navbar {
+    background-color: #333;
+    color: white;
+    overflow: hidden;
+}
+
+.navbar-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 10px 0;
+}
+
+.nav-link {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.nav-link:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.nav-link span {
+    float: left;
+    padding: 14px 16px;
+    color: white;
+    font-size: 17px;
+}

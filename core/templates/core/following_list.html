@@ -1,0 +1,23 @@
+<!-- following_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+Following List
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Following</h2>
+    <ul class="list-group">
+        {% for followee in following %}
+            <li class="list-group-item">
+                {{ followee.user.username }}
+                <!-- フォロー解除ボタン -->
+                <a href="{% url 'unfollow_user' followee.user.id %}" class="btn btn-danger btn-sm">Unfollow</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">You are not following anyone.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

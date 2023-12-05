@@ -1,0 +1,25 @@
+<!-- post_tweet.html -->
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+Post Tweet - Your Django Project
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Post a Tweet</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="content">Your Tweet</label>
+            {{ form.content|add_class:'form-control' }}
+        </div>
+        <div class="form-group">
+            <label for="image">Image (optional)</label>
+            {{ form.image|add_class:'form-control-file' }}
+        </div>
+        <button type="submit" class="btn btn-primary">Tweet</button>
+    </form>
+</div>
+{% endblock %}

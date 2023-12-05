@@ -1,0 +1,30 @@
+<!-- home.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+Packtter
+{% endblock %}
+
+{% block content %}
+    <div class="header">
+        <h1>Packtter</h1>
+    </div>
+    <h2>Timeline</h2>
+    <ul class="tweet-list">
+        {% for tweet in tweets %}
+            <li>
+                <div class="tweet-user">{{ tweet.user.username }}</div>
+                <div class="tweet-content">{{ tweet.content }}</div>
+                {% if tweet.image %}
+                    <img src="{{ tweet.image.url }}" alt="Tweet image" style="max-width: 300px; height: auto;">
+                {% endif %}
+                <div class="tweet-date">Posted on {{ tweet.created_at }}</div>
+                {% if request.user.is_authenticated and tweet.user.id != request.user.id and not tweet.user.id in following_status %}
+                  <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary">Follow</a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No tweets yet.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

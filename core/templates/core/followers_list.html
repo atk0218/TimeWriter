@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Followers List
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Followers</h2>
+    <ul class="list-group">
+        {% for follower in followers %}
+            <li class="list-group-item">{{ follower.user.username }}</li>
+        {% empty %}
+            <li class="list-group-item">No followers.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

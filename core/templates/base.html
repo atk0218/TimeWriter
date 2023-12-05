@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Your Django Project{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'home' %}">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link">Logged in as {{ user.username }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'logout' %}" class="nav-link">Log Out</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'signup' %}" class="nav-link">Sign Up</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="nav-link">Log In</a>
+                    </li>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a href="{% url 'post_tweet' %}" class="nav-link">Tweet</a>
+                </li>
+                {% endif %}
+                {% if request.user.is_authenticated %}
+                <!-- フォロワー一覧ページへのリンク -->
+                    <a href="{% url 'followers_list' %}" class="nav-link">Followers</a>
+                {% endif %}
+                {% if request.user.is_authenticated %}
+                <!-- フォローしている人の一覧ページへのリンク -->
+                    <a href="{% url 'following_list' %}" class="nav-link">Following</a>
+                {% endif %}
+            </ul>
+            <form class="form-inline ml-auto" action="{% url 'search_results' %}" method="get">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search tweets" aria-label="Search" name="q">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}
+        <!-- Content goes here -->
+        {% endblock %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
