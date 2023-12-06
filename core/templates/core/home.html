@@ -2,29 +2,53 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Packtter
+Packter
 {% endblock %}
 
 {% block content %}
-    <div class="header">
-        <h1>Packtter</h1>
+<div class="container">
+    <div class="row">
+        <!-- ユーザー自身のタイムライン -->
+        <div class="col-md-6">
+            <h2>Your Timeline</h2>
+            <ul class="tweet-list">
+                {% for tweet in user_tweets %}
+                <li>
+                    <div class="tweet-user">{{ tweet.user.username }}</div>
+                    <div class="tweet-content">{{ tweet.content }}</div>
+                    {% if tweet.image %}
+                        <img src="{{ tweet.image.url }}" alt="Tweet image" style="max-width: 300px; height: auto;">
+                    {% endif %}
+                    <div class="tweet-date">Posted on {{ tweet.created_at }}</div>
+                    {% if request.user.is_authenticated and tweet.user.id != request.user.id and not tweet.user.id in following_status %}
+                      <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary">Follow</a>
+                    {% endif %}
+                {% empty %}
+                    <li>No tweets yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- フォローしている人のタイムライン -->
+        <div class="col-md-6">
+            <h2>Following Timeline</h2>
+            <ul class="tweet-list">
+                {% for tweet in following_tweets %}
+                <li>
+                    <div class="tweet-user">{{ tweet.user.username }}</div>
+                    <div class="tweet-content">{{ tweet.content }}</div>
+                    {% if tweet.image %}
+                        <img src="{{ tweet.image.url }}" alt="Tweet image" style="max-width: 300px; height: auto;">
+                    {% endif %}
+                    <div class="tweet-date">Posted on {{ tweet.created_at }}</div>
+                    {% if request.user.is_authenticated and tweet.user.id != request.user.id and not tweet.user.id in following_status %}
+                      <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary">Follow</a>
+                    {% endif %}
+                {% empty %}
+                    <li>No tweets from following.</li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
-    <h2>Timeline</h2>
-    <ul class="tweet-list">
-        {% for tweet in tweets %}
-            <li>
-                <div class="tweet-user">{{ tweet.user.username }}</div>
-                <div class="tweet-content">{{ tweet.content }}</div>
-                {% if tweet.image %}
-                    <img src="{{ tweet.image.url }}" alt="Tweet image" style="max-width: 300px; height: auto;">
-                {% endif %}
-                <div class="tweet-date">Posted on {{ tweet.created_at }}</div>
-                {% if request.user.is_authenticated and tweet.user.id != request.user.id and not tweet.user.id in following_status %}
-                  <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary">Follow</a>
-                {% endif %}
-            </li>
-        {% empty %}
-            <li>No tweets yet.</li>
-        {% endfor %}
-    </ul>
+</div>
 {% endblock %}

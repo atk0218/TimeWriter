@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f8fa;
+    background-color: #dee9f3 !important; /* 淡いブルー */
     color: #14171a;
     margin: 0;
     padding: 0;
@@ -10,7 +10,15 @@ body {
     width: 60%;
     margin: auto;
     overflow: hidden;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px; /* ナビゲーションバーとの間隔 */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); /* 影をつける */
+    background-color: #ffffff !important; /* 淡いブルー */
+
 }
+
+
 
 .header, .footer {
     background: #1da1f2;
@@ -124,8 +132,7 @@ input[type=text], textarea {
 }
 
 .navbar {
-    background-color: #333;
-    color: white;
+    background-color: #ffffff; /* ナビゲーションバーは白色に設定 */
     overflow: hidden;
 }
 
