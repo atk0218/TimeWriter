@@ -14,6 +14,16 @@ from wordcloud import WordCloud
 from janome.tokenizer import Tokenizer  # 日本語の場合
 import os
 from django.conf import settings
+from django.db.models.functions import TruncDate
+from django.db.models import Count
+from django.utils import timezone
+from datetime import timedelta
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')  # GUIバックエンドを使用しないように設定
+import io
+import urllib, base64
+from django.utils.timezone import localtime
 
 def home(request):
     if request.user.is_authenticated:
@@ -120,7 +130,42 @@ def tweet_analyze(request):
         tweet_texts = [tweet.content for tweet in tweets]
         wordcloud_path = generate_wordcloud(tweet_texts)
 
-        return render(request, 'core/tweet_analyze.html', {'wordcloud_path': wordcloud_path})
+        # 過去30日間の日付を生成
+        end_date =  localtime(timezone.now())
+        start_date = end_date - timedelta(days=14)
+
+        # 日付ごとのツイート数を集計
+        daily_tweets = Tweet.objects.filter(created_at__range=[start_date, end_date], user=request.user)
+        daily_tweets = daily_tweets.annotate(day=TruncDate('created_at')).values('day').annotate(count=Count('id'))
+
+        # データの整形
+        dates = [start_date + timedelta(days=i) for i in range(14)]
+        counts = [0] * 14
+        for tweet in daily_tweets:
+            index = (tweet['day']- start_date.date()).days
+            
+            # リストのサイズを超えていないことを確認
+            if 0 <= index < 14:
+                counts[index] = tweet['count']
+
+        # グラフの生成
+        plt.figure(figsize=(10, 6))
+        plt.plot(dates, counts, marker='o')
+        plt.xlabel('Date')
+        plt.ylabel('Number of Tweets')
+        plt.title('Tweets in the Last 30 Days')
+
+        # グラフをBase64エンコーディングされた画像として保存
+        fig = plt.gcf()
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        string = base64.b64encode(buf.read())
+        uri = 'data:image/png;base64,' + urllib.parse.quote(string)
+        
+        plt.close()  # グラフを閉じる
+        
+        return render(request, 'core/tweet_analyze.html', {'wordcloud_path': wordcloud_path, 'graph': uri})
 
     else:
         return HttpResponseRedirect(reverse('login'))
@@ -134,7 +179,7 @@ def generate_wordcloud(texts):
         words.extend([token.base_form for token in tokens if token.part_of_speech.startswith(('名詞', '動詞'))])
 
     font_path = "/Library/Fonts/Arial Unicode.ttf"
-    wordcloud = WordCloud(background_color='white', font_path=font_path).generate(' '.join(words))
+    wordcloud = WordCloud(width=800, height=400,background_color='white', font_path=font_path).generate(' '.join(words))
 
     filename = 'wordcloud.png'
     file_path = os.path.join(settings.MEDIA_ROOT, filename)
@@ -142,3 +187,15 @@ def generate_wordcloud(texts):
     wordcloud.to_file(file_path)
 
     return os.path.join(settings.MEDIA_URL, filename)
+
+@login_required
+def delete_tweet(request, tweet_id):
+    tweet = get_object_or_404(Tweet, id=tweet_id)
+
+    if request.user.is_authenticated and tweet.user == request.user:
+        tweet.delete()
+        # 削除後のリダイレクト先
+        return redirect('home')
+    else:
+        # アクセス権限がない場合の処理
+        return redirect('home')

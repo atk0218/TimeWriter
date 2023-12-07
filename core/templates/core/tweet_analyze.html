@@ -8,6 +8,11 @@ Tweet_Analyze
 {% block content %}
 <h2>Tweet Analysis</h2>
 <div class="container">
-    <img src="{{ wordcloud_path }}" alt="Word Cloud">
+    <h3>Word Cloud</h3>
+    <img src="{{ wordcloud_path }}" alt="Word Cloud" class="centered-image">
+    <br/>
+    <h3>Tweet Graph</h3>
+    <img src="{{ graph }}" alt="Tweet Graph">
 </div>
+
 {% endblock %}

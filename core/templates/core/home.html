@@ -23,6 +23,9 @@ Packter
                     {% if request.user.is_authenticated and tweet.user.id != request.user.id and not tweet.user.id in following_status %}
                       <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary">Follow</a>
                     {% endif %}
+                    {% if tweet.user == request.user %}
+                    <a href="{% url 'delete_tweet' tweet.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    {% endif %}
                 {% empty %}
                     <li>No tweets yet.</li>
                 {% endfor %}
