@@ -34,6 +34,9 @@
                 <li class="nav-item">
                     <a href="{% url 'post_tweet' %}" class="nav-link">Tweet</a>
                 </li>
+                <li class="nav-item">
+                    <a href="{% url 'tweet_generate' %}" class="nav-link">Tweet Generate</a>
+                </li>
                 {% endif %}
                 {% if request.user.is_authenticated %}
                 <!-- フォロワー一覧ページへのリンク -->

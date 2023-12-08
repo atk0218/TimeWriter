@@ -24,6 +24,8 @@ matplotlib.use('Agg')  # GUIバックエンドを使用しないように設定
 import io
 import urllib, base64
 from django.utils.timezone import localtime
+from django.contrib import messages
+import openai
 
 def home(request):
     if request.user.is_authenticated:
@@ -153,8 +155,10 @@ def tweet_analyze(request):
         plt.plot(dates, counts, marker='o')
         plt.xlabel('Date')
         plt.ylabel('Number of Tweets')
-        plt.title('Tweets in the Last 30 Days')
-
+        plt.title('Tweets in the Last 14 Days')
+        plt.gca().xaxis.set_major_locator(plt.MaxNLocator(integer=True))
+        plt.yticks(range(min(counts), max(counts) + 1))
+        
         # グラフをBase64エンコーディングされた画像として保存
         fig = plt.gcf()
         buf = io.BytesIO()
@@ -199,3 +203,63 @@ def delete_tweet(request, tweet_id):
     else:
         # アクセス権限がない場合の処理
         return redirect('home')
+    
+@login_required
+def tweet_generate_view(request):
+    if request.method == "POST":
+        # OpenAIを使用してツイート文を生成するロジック
+        recent_tweets = Tweet.objects.filter(user=request.user).order_by('-created_at')[:10]
+        tweets_text = ' '.join(tweet.content for tweet in recent_tweets)
+        
+        openai.api_key = settings.OPENAI_API_KEY
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "過去10件以下のツイートからユーザの性格を考慮したツイートを日本語で作成してください。作成するツイートは50文字以内にし、簡潔な内容にしてください。また仲の良い友達に向けてツイートする内容にしてください"
+                },
+                {
+                    "role": "user",
+                    "content": tweets_text
+                },
+            ],
+        )
+
+        print(response["choices"][0]["message"]["content"])        
+        
+        # 生成されたツイートをセッションに保存
+        request.session['generated_tweet'] = response["choices"][0]["message"]["content"]
+        request.session.save()
+
+        return redirect('tweet_create')
+    return render(request, 'core/tweet_generate.html')
+
+@login_required
+def tweet_create_view(request):
+    generated_tweet = request.session.get('generated_tweet', '')
+
+    if request.method == 'POST':
+        tweet_content = request.POST.get('tweet_content')
+
+        # ツイート内容が空でないことを確認
+        if tweet_content:
+            # ツイートをデータベースに保存
+            Tweet.objects.create(user=request.user, content=tweet_content)
+            return redirect('home')
+        else:
+            # 空のツイートの場合はエラーメッセージを表示
+            messages.error(request, 'Tweet content cannot be empty.')
+
+    return render(request, 'core/tweet_create.html', {'generated_tweet': generated_tweet})
+
+@login_required
+def tweet_post_view(request):
+    if request.method == "POST":
+        tweet_content = request.POST.get('tweet_content')
+        if tweet_content:
+            # ツイートをデータベースに保存
+            Tweet.objects.create(user=request.user, content=tweet_content)
+            return redirect('home')
+
+    return redirect('tweet_create')

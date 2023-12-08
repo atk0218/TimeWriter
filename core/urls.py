@@ -19,6 +19,9 @@ urlpatterns = [
     path('unfollow/<int:user_id>/', views.unfollow_user, name='unfollow_user'),
     path('tweet_analyze/', views.tweet_analyze, name='tweet_analyze'),
     path('delete_tweet/<int:tweet_id>/', views.delete_tweet, name='delete_tweet'),
+    path('tweet_generate/', views.tweet_generate_view, name='tweet_generate'),
+    path('tweet_create/', views.tweet_create_view, name='tweet_create'),
+    path('tweet_post/', views.tweet_post_view, name='tweet_post'),
 ]
 
 if settings.DEBUG:

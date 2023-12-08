@@ -1,0 +1,16 @@
+<!-- tweet_generate.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+Tweet_Generate By ChatGPT
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Generate a Tweet by ChatGPT</h2>
+    <form action="{% url 'tweet_generate' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Generate Tweet</button>
+    </form>
+</div>
+{% endblock %}
