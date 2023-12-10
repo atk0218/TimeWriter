@@ -1,8 +1,8 @@
-<!-- home.html -->
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-Packter
+つぶやき
 {% endblock %}
 
 {% block content %}
@@ -26,6 +26,10 @@ Packter
                     {% if tweet.user == request.user %}
                     <a href="{% url 'delete_tweet' tweet.id %}" class="btn btn-danger btn-sm">Delete</a>
                     {% endif %}
+                    <button id="like-btn-{{ tweet.id }}" type="button" class="btn btn-primary btn-sm" onclick="toggleLike({{ tweet.id }})">
+                        {% if request.user in tweet.likes.all %} Unlike {% else %} Like {% endif %}
+                    </button>
+                    <span id="likes-count-{{ tweet.id }}">{{ tweet.likes.count }} Likes</span>
                 {% empty %}
                     <li>No tweets yet.</li>
                 {% endfor %}
@@ -47,6 +51,10 @@ Packter
                     {% if request.user.is_authenticated and tweet.user.id != request.user.id and not tweet.user.id in following_status %}
                       <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary">Follow</a>
                     {% endif %}
+                    <button id="like-btn-{{ tweet.id }}" type="button" class="btn btn-primary btn-sm" onclick="toggleLike({{ tweet.id }})">
+                        {% if request.user in tweet.likes.all %} Unlike {% else %} Like {% endif %}
+                    </button>
+                    <span id="likes-count-{{ tweet.id }}">{{ tweet.likes.count }} Likes</span>
                 {% empty %}
                     <li>No tweets from following.</li>
                 {% endfor %}
@@ -54,4 +62,23 @@ Packter
         </div>
     </div>
 </div>
+<script>
+    function toggleLike(tweetId) {
+        console.log("test");
+        $.ajax({
+            url: "{% url 'like_tweet_ajax' %}",
+            type: "POST",
+            data: {
+                'tweet_id': tweetId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                let btn = $("#like-btn-" + tweetId);
+                let likesCount = $("#likes-count-" + tweetId);
+                btn.text(response.liked ? "Unlike" : "Like");
+                likesCount.text(response.likes_count + " Likes");
+            }
+        });
+    }
+</script>
 {% endblock %}

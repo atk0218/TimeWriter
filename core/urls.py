@@ -22,6 +22,9 @@ urlpatterns = [
     path('tweet_generate/', views.tweet_generate_view, name='tweet_generate'),
     path('tweet_create/', views.tweet_create_view, name='tweet_create'),
     path('tweet_post/', views.tweet_post_view, name='tweet_post'),
+    path('like_tweet_ajax/', views.like_tweet_ajax, name='like_tweet_ajax'),
+    path('delete_tweet_ajax/', views.delete_tweet_ajax, name='delete_tweet_ajax'),
+
 ]
 
 if settings.DEBUG:

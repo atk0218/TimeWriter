@@ -26,6 +26,9 @@ import urllib, base64
 from django.utils.timezone import localtime
 from django.contrib import messages
 import openai
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
 
 def home(request):
     if request.user.is_authenticated:
@@ -94,16 +97,24 @@ def signup(request):
 
 def search_results(request):
     query = request.GET.get('q', '')
-    tweets = Tweet.objects.filter(content__icontains=query)
+    all_tweets = Tweet.objects.filter(content__icontains=query).order_by('-created_at')
+
     if request.user.is_authenticated:
+        my_tweets = all_tweets.filter(user=request.user)
+        other_tweets = all_tweets.exclude(user=request.user)
         user_profile = request.user.userprofile
         following_ids = user_profile.following.values_list('user', flat=True)
-        # フォロー状態を確認
         following_status = {user_id: True for user_id in following_ids}
     else:
+        my_tweets = Tweet.objects.none()
+        other_tweets = all_tweets
         following_status = {}
 
-    return render(request, 'core/search_results.html', {'tweets': tweets, 'following_status': following_status})
+    return render(request, 'core/search_results.html', {
+        'my_tweets': my_tweets,
+        'other_tweets': other_tweets,
+        'following_status': following_status
+    })
 
 @login_required
 def followers_list(request):
@@ -209,7 +220,7 @@ def tweet_generate_view(request):
     if request.method == "POST":
         # OpenAIを使用してツイート文を生成するロジック
         recent_tweets = Tweet.objects.filter(user=request.user).order_by('-created_at')[:10]
-        tweets_text = ' '.join(tweet.content for tweet in recent_tweets)
+        tweets_text = '¥n'.join(tweet.content for tweet in recent_tweets)
         
         openai.api_key = settings.OPENAI_API_KEY
         response = openai.ChatCompletion.create(
@@ -217,7 +228,7 @@ def tweet_generate_view(request):
             messages=[
                 {
                     "role": "system",
-                    "content": "過去10件以下のツイートからユーザの性格を考慮したツイートを日本語で作成してください。作成するツイートは50文字以内にし、簡潔な内容にしてください。また仲の良い友達に向けてツイートする内容にしてください"
+                    "content": "過去10件以下のツイートからユーザの性格を考慮したツイートを日本語で作成してください。ツイートは上から順に新しい順になっています。作成するツイートは50文字以内にし、簡潔な内容にしてください。また仲の良い友達に向けてツイートする内容にしてください"
                 },
                 {
                     "role": "user",
@@ -225,8 +236,6 @@ def tweet_generate_view(request):
                 },
             ],
         )
-
-        print(response["choices"][0]["message"]["content"])        
         
         # 生成されたツイートをセッションに保存
         request.session['generated_tweet'] = response["choices"][0]["message"]["content"]
@@ -263,3 +272,23 @@ def tweet_post_view(request):
             return redirect('home')
 
     return redirect('tweet_create')
+
+def like_tweet_ajax(request):
+    tweet_id = request.POST.get('tweet_id')
+    tweet = get_object_or_404(Tweet, id=tweet_id)
+
+    if tweet.likes.filter(id=request.user.id).exists():
+        tweet.likes.remove(request.user)
+        liked = False
+    else:
+        tweet.likes.add(request.user)
+        liked = True
+
+    return JsonResponse({'liked': liked, 'likes_count': tweet.likes.count()})
+
+@require_POST
+def delete_tweet_ajax(request):
+    tweet_id = request.POST.get('tweet_id')
+    tweet = get_object_or_404(Tweet, id=tweet_id, user=request.user)
+    tweet.delete()
+    return JsonResponse({'success': True})

@@ -7,6 +7,7 @@ class Tweet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField(max_length=280)
     image = models.ImageField(upload_to='tweet_images', null=True, blank=True)  # 画像フィールドを追加
+    likes = models.ManyToManyField(User, related_name='likes', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
