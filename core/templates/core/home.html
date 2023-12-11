@@ -6,10 +6,36 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid">
     <div class="row">
+        <div class="col-md-4">
+            <h2>All Tweets</h2>
+            <ul class="tweet-list">
+                {% for tweet in all_tweets %}
+                <li>
+                    <div class="tweet-user">{{ tweet.user.username }}</div>
+                    <div class="tweet-content">{{ tweet.content }}</div>
+                    {% if tweet.image %}
+                        <img src="{{ tweet.image.url }}" alt="Tweet image" style="max-width: 300px; height: auto;">
+                    {% endif %}
+                    <div class="tweet-date">Posted on {{ tweet.created_at }}</div>
+                    {% if request.user.is_authenticated and tweet.user.id != request.user.id and not tweet.user.id in following_status %}
+                      <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary btn-sm">Follow</a>
+                    {% endif %}
+                    {% if tweet.user == request.user %}
+                    <a href="{% url 'delete_tweet' tweet.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    {% endif %}
+                    <button id="like-btn-{{ tweet.id }}" type="button" class="btn btn-primary btn-sm" onclick="toggleLike({{ tweet.id }})">
+                        {% if request.user in tweet.likes.all %} Unlike {% else %} Like {% endif %}
+                    </button>
+                    <span id="likes-count-{{ tweet.id }}">{{ tweet.likes.count }} Likes</span>
+                {% empty %}
+                    <li>No tweets yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
         <!-- ユーザー自身のタイムライン -->
-        <div class="col-md-6">
+        <div class="col-md-4">
             <h2>Your Timeline</h2>
             <ul class="tweet-list">
                 {% for tweet in user_tweets %}
@@ -21,7 +47,7 @@
                     {% endif %}
                     <div class="tweet-date">Posted on {{ tweet.created_at }}</div>
                     {% if request.user.is_authenticated and tweet.user.id != request.user.id and not tweet.user.id in following_status %}
-                      <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary">Follow</a>
+                      <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary btn-sm">Follow</a>
                     {% endif %}
                     {% if tweet.user == request.user %}
                     <a href="{% url 'delete_tweet' tweet.id %}" class="btn btn-danger btn-sm">Delete</a>
@@ -37,7 +63,7 @@
         </div>
 
         <!-- フォローしている人のタイムライン -->
-        <div class="col-md-6">
+        <div class="col-md-4">
             <h2>Following Timeline</h2>
             <ul class="tweet-list">
                 {% for tweet in following_tweets %}
@@ -49,7 +75,7 @@
                     {% endif %}
                     <div class="tweet-date">Posted on {{ tweet.created_at }}</div>
                     {% if request.user.is_authenticated and tweet.user.id != request.user.id and not tweet.user.id in following_status %}
-                      <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary">Follow</a>
+                      <a href="{% url 'follow_user' tweet.user.id %}" class="btn btn-primary btn-sm">Follow</a>
                     {% endif %}
                     <button id="like-btn-{{ tweet.id }}" type="button" class="btn btn-primary btn-sm" onclick="toggleLike({{ tweet.id }})">
                         {% if request.user in tweet.likes.all %} Unlike {% else %} Like {% endif %}

@@ -41,17 +41,20 @@ def home(request):
         following_ids = user_profile.following.values_list('user', flat=True)
         following_tweets = Tweet.objects.filter(user_id__in=following_ids).order_by('-created_at')
 
+        # 全ユーザーのツイート
+        all_tweets = Tweet.objects.exclude(user=request.user).order_by('-created_at')
+
         # フォロー状態を確認
         following_status = {user_id: True for user_id in following_ids}
 
     else:
         # 未ログインの場合は全てのツイートを表示
         user_tweets = Tweet.objects.none()
-        following_tweets = Tweet.objects.all().order_by('-created_at')
+        following_tweets = Tweet.objects.none()
+        all_tweets = Tweet.objects.all().order_by('-created_at')
         following_status = {}
 
-    return render(request, 'core/home.html', {'user_tweets': user_tweets, 'following_tweets': following_tweets, 'following_status': following_status})
-
+    return render(request, 'core/home.html', {'user_tweets': user_tweets, 'following_tweets': following_tweets, 'all_tweets': all_tweets, 'following_status': following_status})
 
 @login_required
 def post_tweet(request):
@@ -101,17 +104,22 @@ def search_results(request):
 
     if request.user.is_authenticated:
         my_tweets = all_tweets.filter(user=request.user)
-        other_tweets = all_tweets.exclude(user=request.user)
-        user_profile = request.user.userprofile
-        following_ids = user_profile.following.values_list('user', flat=True)
+
+        # フォローしているユーザーのIDリストを取得
+        following_ids = request.user.userprofile.following.values_list('id', flat=True)
+        following_tweets = all_tweets.filter(user__id__in=following_ids)
+
+        other_tweets = all_tweets.exclude(user=request.user).exclude(user__id__in=following_ids)
         following_status = {user_id: True for user_id in following_ids}
     else:
         my_tweets = Tweet.objects.none()
+        following_tweets = Tweet.objects.none()
         other_tweets = all_tweets
         following_status = {}
 
     return render(request, 'core/search_results.html', {
         'my_tweets': my_tweets,
+        'following_tweets': following_tweets,
         'other_tweets': other_tweets,
         'following_status': following_status
     })
@@ -228,7 +236,7 @@ def tweet_generate_view(request):
             messages=[
                 {
                     "role": "system",
-                    "content": "過去10件以下のツイートからユーザの性格を考慮したツイートを日本語で作成してください。ツイートは上から順に新しい順になっています。作成するツイートは50文字以内にし、簡潔な内容にしてください。また仲の良い友達に向けてツイートする内容にしてください"
+                    "content": "過去10件以下のツイートからユーザの性格を考慮したツイートを日本語で作成してください。コンテキストは上から順に新しい順になっています。作成するツイートは50文字以内でかつ1つの文章として作成してください。"
                 },
                 {
                     "role": "user",
@@ -238,7 +246,7 @@ def tweet_generate_view(request):
         )
         
         # 生成されたツイートをセッションに保存
-        request.session['generated_tweet'] = response["choices"][0]["message"]["content"]
+        request.session['generated_tweet'] = response["choices"][0]["message"]["content"].replace("「","").replace("」","")
         request.session.save()
 
         return redirect('tweet_create')

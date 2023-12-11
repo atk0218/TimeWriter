@@ -7,7 +7,8 @@ body {
 }
 
 .container {
-    width: 60%;
+    width: 100% !important;
+    max-width: 1400px !important;
     margin: auto;
     overflow: hidden;
     padding: 20px;
@@ -15,7 +16,6 @@ body {
     margin-top: 20px; /* ナビゲーションバーとの間隔 */
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); /* 影をつける */
     background-color: #ffffff !important; /* 淡いブルー */
-
 }
 
 
