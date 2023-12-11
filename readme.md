@@ -1,5 +1,5 @@
 # 概要
-Twitterのクローンのほとんどの部分をGPT4で作ってみました。
+GPT4を使ってTwitterのクローンを作ってみました。
 
 # 画面
 ![home](https://github.com/atk0218/TimeWriter/assets/10042366/38ccacfc-608f-451a-af78-6b38ffb7b43d)
