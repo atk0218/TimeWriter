@@ -2,7 +2,7 @@
 Twitterのクローンのほとんどの部分をGPT4で作ってみました。
 
 # 画面
-![home](https://github.com/atk0218/packterbygpt4/assets/10042366/6bc95519-6e91-444b-a854-c52ac2393655)
+![home](https://github.com/atk0218/TimeWriter/assets/10042366/38ccacfc-608f-451a-af78-6b38ffb7b43d)
 
 # 機能
 - ツイート投稿機能(文字、画像（1つまで))
